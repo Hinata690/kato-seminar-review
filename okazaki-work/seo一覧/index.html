@@ -155,7 +155,10 @@ document.addEventListener('mouseup', (e) => {
 document.addEventListener('mousedown', (e) => {
   if (floatingEl && !floatingEl.contains(e.target) && !e.target.closest('mark.hl-highlight, span.hl-underline')) closeFloating();
 });
-root.addEventListener('click', (e) => { const el = e.target.closest('[data-id]'); if (el) showPopup(el.dataset.id, el); });
+root.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-id]');
+  if (el) { e.preventDefault(); e.stopPropagation(); showPopup(el.dataset.id, el); }
+});
 const q = query(collection(db, 'seo_annotations'), orderBy('createdAt', 'asc'));
 onSnapshot(q, (snapshot) => { annotations = snapshot.docs.map((d) => ({ id: d.id, ...d.data() })); renderAnnotations(); });
 </script>

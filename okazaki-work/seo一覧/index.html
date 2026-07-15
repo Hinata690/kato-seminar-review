@@ -1,1 +1,162 @@
-<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="robots" content="noindex, nofollow"><title>SEO一覧 | 岡崎作業用</title><style>body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN', sans-serif; background: linear-gradient(180deg, #eef4ff 0%, #f7faff 100%); margin: 0; padding: 56px 24px; color: #14264a; } .container { max-width: 680px; margin: 0 auto; } a.back { display: inline-block; margin-bottom: 24px; color: #2563eb; text-decoration: none; font-size: 14px; font-weight: 600; } a.back:hover { text-decoration: underline; } h1 { margin: 0 0 16px 0; font-size: 26px; color: #1e3a8a; letter-spacing: 0.02em; border-left: 4px solid #2563eb; padding-left: 14px; } ul { list-style: none; padding: 0; margin: 0; } li { background: #ffffff; border: 1px solid #dbe6fb; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(30, 58, 138, 0.06); } li a { color: #2563eb; text-decoration: none; font-weight: 600; } li a:hover { text-decoration: underline; } footer { margin-top: 40px; font-size: 12px; color: #93a2bf; } .memo-panel { margin-top: 32px; background: #ffffff; border: 1px solid #dbe6fb; border-radius: 10px; padding: 20px 24px; box-shadow: 0 1px 3px rgba(30, 58, 138, 0.06); } .memo-panel h2 { font-size: 18px; margin: 0 0 14px 0; color: #1e3a8a; } .memo-panel label { display: block; font-size: 13px; color: #4a5b7c; margin-bottom: 4px; } .memo-panel input[type="text"], .memo-panel textarea { width: 100%; border: 1px solid #dbe6fb; border-radius: 8px; padding: 8px 10px; font-size: 14px; font-family: inherit; margin-bottom: 12px; box-sizing: border-box; } .memo-panel textarea { min-height: 70px; resize: vertical; } .memo-panel button { background: #2563eb; color: #fff; border: none; border-radius: 8px; padding: 9px 18px; font-size: 14px; font-weight: 600; cursor: pointer; } .memo-panel button:hover { background: #1d4ed8; } .memo-status { font-size: 13px; color: #6b7fa3; margin-left: 10px; } .memo-history { margin-top: 20px; border-top: 1px solid #eef2fb; padding-top: 16px; } .memo-item { padding: 10px 0; border-bottom: 1px solid #f0f4fc; } .memo-item:last-child { border-bottom: none; } .memo-meta { display: flex; justify-content: space-between; font-size: 12px; color: #6b7fa3; margin-bottom: 4px; } .memo-name { font-weight: 600; color: #1e3a8a; } .memo-text { font-size: 14px; color: #14264a; white-space: pre-wrap; } .memo-empty { font-size: 13px; color: #93a2bf; }</style></head><body><div class="container"><a class="back" href="../">← 岡崎作業用に戻る</a><h1>SEO一覧</h1><ul><li><a href="../seo:yobishiken-2026.html">予備試験とは？令和8年（2026年）の日程・科目・合格率まとめ</a></li></ul><div class="memo-panel"><h2>メモ・コメント</h2><form id="memo-form"><label for="memo-name">名前</label><input type="text" id="memo-name" maxlength="49" required><label for="memo-text">メモ</label><textarea id="memo-text" maxlength="999" required></textarea><button type="submit">追加する</button><span class="memo-status" id="memo-status"></span></form><div class="memo-history" id="memo-history"><p class="memo-empty">読み込み中...</p></div></div><footer>© kato-seminar-review</footer></div><script type="module">import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js"; import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js"; const firebaseConfig = { apiKey: "AIzaSyClRvwl06F8sPrw6kUwZ1SlWy0M3FzBO7c", authDomain: "okazaki-kato-seminar00.firebaseapp.com", projectId: "okazaki-kato-seminar00", storageBucket: "okazaki-kato-seminar00.firebasestorage.app", messagingSenderId: "264771224160", appId: "1:264771224160:web:f89b3a4004330ea7fef905" }; const app = initializeApp(firebaseConfig); const db = getFirestore(app); const form = document.getElementById('memo-form'); const nameInput = document.getElementById('memo-name'); const memoInput = document.getElementById('memo-text'); const historyEl = document.getElementById('memo-history'); const statusEl = document.getElementById('memo-status'); form.addEventListener('submit', async function(e) { e.preventDefault(); const name = nameInput.value.trim(); const memo = memoInput.value.trim(); if (!name || !memo) { return; } statusEl.textContent = '送信中...'; try { await addDoc(collection(db, 'seo_memos'), { name: name, memo: memo, createdAt: serverTimestamp() }); memoInput.value = ''; statusEl.textContent = ''; } catch (err) { statusEl.textContent = '送信に失敗しました。'; console.error(err); } }); const q = query(collection(db, 'seo_memos'), orderBy('createdAt', 'desc')); onSnapshot(q, function(snapshot) { historyEl.innerHTML = ''; if (snapshot.empty) { historyEl.innerHTML = '<p class="memo-empty">まだメモはありません。</p>'; return; } snapshot.forEach(function(docSnap) { const data = docSnap.data(); const item = document.createElement('div'); item.className = 'memo-item'; const meta = document.createElement('div'); meta.className = 'memo-meta'; const nameSpan = document.createElement('span'); nameSpan.className = 'memo-name'; nameSpan.textContent = data.name || ''; const dateSpan = document.createElement('span'); dateSpan.className = 'memo-date'; dateSpan.textContent = (data.createdAt && data.createdAt.toDate) ? data.createdAt.toDate().toLocaleString('ja-JP') : '送信中...'; meta.appendChild(nameSpan); meta.appendChild(dateSpan); const textDiv = document.createElement('div'); textDiv.className = 'memo-text'; textDiv.textContent = data.memo || ''; item.appendChild(meta); item.appendChild(textDiv); historyEl.appendChild(item); }); });</script></body></html>
+<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="robots" content="noindex, nofollow"><title>SEO一覧 | 岡崎作業用</title><style>
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN', sans-serif; background: linear-gradient(180deg, #eef4ff 0%, #f7faff 100%); margin: 0; padding: 56px 24px; color: #14264a; }
+.container { max-width: 680px; margin: 0 auto; }
+a.back { display: inline-block; margin-bottom: 24px; color: #2563eb; text-decoration: none; font-size: 14px; font-weight: 600; }
+a.back:hover { text-decoration: underline; }
+h1 { margin: 0 0 16px 0; font-size: 26px; color: #1e3a8a; letter-spacing: 0.02em; border-left: 4px solid #2563eb; padding-left: 12px; }
+#annotatable { position: relative; line-height: 2; font-size: 15px; }
+#annotatable ul { padding-left: 20px; }
+#annotatable a { color: #2563eb; }
+mark.hl-highlight { background: #fff59d; padding: 0 1px; border-radius: 2px; cursor: pointer; }
+span.hl-underline { text-decoration: underline; text-decoration-color: #ef4444; text-decoration-thickness: 3px; cursor: pointer; }
+.hl-hint { font-size: 12px; color: #64748b; margin-top: 28px; border-top: 1px dashed #cbd5e1; padding-top: 12px; }
+footer { margin-top: 40px; font-size: 12px; color: #94a3b8; }
+.hl-toolbar { position: absolute; z-index: 1000; background: #1e293b; border-radius: 8px; padding: 6px; display: flex; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,.25); }
+.hl-toolbar button { border: none; background: #334155; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.hl-toolbar button:hover { background: #475569; }
+.hl-card { position: absolute; z-index: 1000; background: #fff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; width: 260px; box-shadow: 0 8px 24px rgba(0,0,0,.18); font-size: 13px; }
+.hl-card label { display: block; font-size: 12px; color: #334155; margin-top: 8px; margin-bottom: 4px; font-weight: 600; }
+.hl-card input, .hl-card textarea { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-family: inherit; }
+.hl-card textarea { resize: vertical; min-height: 60px; }
+.hl-card .hl-buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+.hl-card button.hl-save { background: #2563eb; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 13px; cursor: pointer; }
+.hl-card button.hl-cancel { background: #e2e8f0; color: #334155; border: none; padding: 6px 12px; border-radius: 6px; font-size: 13px; cursor: pointer; }
+.hl-card button.hl-delete { background: #fee2e2; color: #b91c1c; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+.hl-card button.hl-edit { background: #e2e8f0; color: #334155; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+.hl-card .hl-name { font-weight: 700; color: #1e3a8a; margin-bottom: 4px; }
+.hl-card .hl-time { font-size: 11px; color: #64748b; margin-bottom: 8px; }
+.hl-card .hl-memo { white-space: pre-wrap; color: #14264a; margin-bottom: 10px; }
+</style></head><body><div class="container"><a class="back" href="../">← 岡崎作業用に戻る</a><h1>SEO一覧</h1><div id="annotatable"><ul><li><a href="../seo:yobishiken-2026.html">予備試験とは？令和8年（2026年）の日程・科目・合格率まとめ</a></li></ul></div><p class="hl-hint">💡 気になる文章をドラッグして選択すると、マーカーやアンダーラインを引いて名前とメモを残せます。ハイライト部分をクリックするとメモの確認・編集・削除ができます。</p><footer>© kato-seminar-review</footer></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+const firebaseConfig = { apiKey: "AIzaSyClRvwl06F8sPrw6kUwZ1SlWy0M3FzBO7c", authDomain: "okazaki-kato-seminar00.firebaseapp.com", projectId: "okazaki-kato-seminar00", storageBucket: "okazaki-kato-seminar00.firebasestorage.app", messagingSenderId: "264771224160", appId: "1:264771224160:web:f89b3a4004330ea7fef905" };
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const root = document.getElementById('annotatable');
+const pristineHTML = root.innerHTML;
+let annotations = [];
+let floatingEl = null;
+let pendingRange = null;
+function closeFloating() { if (floatingEl && floatingEl.parentNode) floatingEl.parentNode.removeChild(floatingEl); floatingEl = null; }
+function getGlobalOffset(container, node, offset) { const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null); let total = 0, current; while ((current = walker.nextNode())) { if (current === node) return total + offset; total += current.textContent.length; } return total; }
+function wrapRangeByOffsets(container, start, end, type, id) {
+  if (end <= start) return;
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
+  let pos = 0; const targets = []; let current;
+  while ((current = walker.nextNode())) {
+    const len = current.textContent.length; const nodeStart = pos, nodeEnd = pos + len;
+    if (nodeEnd > start && nodeStart < end) { targets.push({ node: current, from: Math.max(0, start - nodeStart), to: Math.min(len, end - nodeStart) }); }
+    pos = nodeEnd;
+    if (pos >= end) break;
+  }
+  targets.forEach(({ node, from, to }) => {
+    let target = node;
+    if (to < target.textContent.length) target.splitText(to);
+    let middle = target;
+    if (from > 0) middle = target.splitText(from);
+    const wrapper = document.createElement(type === 'highlight' ? 'mark' : 'span');
+    wrapper.className = type === 'highlight' ? 'hl-highlight' : 'hl-underline';
+    wrapper.dataset.id = id;
+    middle.parentNode.insertBefore(wrapper, middle);
+    wrapper.appendChild(middle);
+  });
+}
+function renderAnnotations() {
+  const scrollY = window.scrollY;
+  root.innerHTML = pristineHTML;
+  const sorted = [...annotations].sort((a, b) => a.start - b.start);
+  sorted.forEach((ann) => { try { wrapRangeByOffsets(root, ann.start, ann.end, ann.type, ann.id); } catch (e) { console.error('annotation render error', e); } });
+  window.scrollTo(0, scrollY);
+}
+function formatTime(ts) { if (!ts || !ts.toDate) return ''; const d = ts.toDate(); return d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+function escapeHtml(str) { const div = document.createElement('div'); div.textContent = str == null ? '' : str; return div.innerHTML; }
+function escapeAttr(str) { return (str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;'); }
+function showToolbar(range) {
+  closeFloating();
+  pendingRange = range.cloneRange();
+  const rect = range.getBoundingClientRect();
+  const bar = document.createElement('div');
+  bar.className = 'hl-toolbar';
+  bar.innerHTML = '<button type="button" data-type="highlight">🖍 マーカー</button><button type="button" data-type="underline">_ アンダーライン</button>';
+  bar.style.top = (rect.top + window.scrollY - 44) + 'px';
+  bar.style.left = (rect.left + window.scrollX) + 'px';
+  bar.addEventListener('mousedown', (e) => e.preventDefault());
+  bar.addEventListener('click', (e) => { const btn = e.target.closest('button'); if (!btn) return; showForm(btn.dataset.type, rect); });
+  document.body.appendChild(bar);
+  floatingEl = bar;
+}
+function showForm(type, rect) {
+  closeFloating();
+  const card = document.createElement('div');
+  card.className = 'hl-card';
+  const savedName = localStorage.getItem('seo-annotation-name') || '';
+  card.innerHTML = '<label>名前</label><input type="text" class="hl-name-input" maxlength="49" value="' + escapeAttr(savedName) + '"><label>メモ</label><textarea class="hl-memo-input" maxlength="999"></textarea><div class="hl-buttons"><button type="button" class="hl-cancel">キャンセル</button><button type="button" class="hl-save">保存</button></div>';
+  card.style.top = (rect.top + window.scrollY - 44) + 'px';
+  card.style.left = (rect.left + window.scrollX) + 'px';
+  document.body.appendChild(card);
+  floatingEl = card;
+  card.querySelector('.hl-cancel').addEventListener('click', () => { closeFloating(); pendingRange = null; });
+  card.querySelector('.hl-save').addEventListener('click', async () => {
+    const name = card.querySelector('.hl-name-input').value.trim();
+    const memo = card.querySelector('.hl-memo-input').value.trim();
+    if (!name || !memo) { alert('名前とメモを入力してください。'); return; }
+    if (!pendingRange) { closeFloating(); return; }
+    const start = getGlobalOffset(root, pendingRange.startContainer, pendingRange.startOffset);
+    const end = getGlobalOffset(root, pendingRange.endContainer, pendingRange.endOffset);
+    const text = pendingRange.toString();
+    localStorage.setItem('seo-annotation-name', name);
+    try { await addDoc(collection(db, 'seo_annotations'), { start, end, text, type, name, memo, createdAt: serverTimestamp() }); } catch (e) { alert('保存に失敗しました。'); console.error(e); }
+    closeFloating();
+    pendingRange = null;
+    window.getSelection().removeAllRanges();
+  });
+}
+function showPopup(id, anchorEl) {
+  closeFloating();
+  const ann = annotations.find((a) => a.id === id);
+  if (!ann) return;
+  const rect = anchorEl.getBoundingClientRect();
+  const card = document.createElement('div');
+  card.className = 'hl-card';
+  renderPopupView(card, ann);
+  card.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+  card.style.left = Math.max(8, Math.min(rect.left + window.scrollX, window.innerWidth - 280)) + 'px';
+  document.body.appendChild(card);
+  floatingEl = card;
+}
+function renderPopupView(card, ann) {
+  card.innerHTML = '<div class="hl-name">' + escapeHtml(ann.name) + '</div><div class="hl-time">' + formatTime(ann.updatedAt || ann.createdAt) + (ann.updatedAt ? '（編集済み）' : '') + '</div><div class="hl-memo">' + escapeHtml(ann.memo) + '</div><div class="hl-buttons"><button type="button" class="hl-delete">削除</button><button type="button" class="hl-edit">編集</button></div>';
+  card.querySelector('.hl-delete').addEventListener('click', async () => {
+    if (!confirm('このメモを削除しますか？')) return;
+    try { await deleteDoc(doc(db, 'seo_annotations', ann.id)); } catch (e) { alert('削除に失敗しました。'); console.error(e); }
+    closeFloating();
+  });
+  card.querySelector('.hl-edit').addEventListener('click', () => { renderPopupEdit(card, ann); });
+}
+function renderPopupEdit(card, ann) {
+  card.innerHTML = '<label>名前</label><input type="text" class="hl-name-input" maxlength="49" value="' + escapeAttr(ann.name) + '"><label>メモ</label><textarea class="hl-memo-input" maxlength="999">' + escapeHtml(ann.memo) + '</textarea><div class="hl-buttons"><button type="button" class="hl-cancel">キャンセル</button><button type="button" class="hl-save">保存</button></div>';
+  card.querySelector('.hl-cancel').addEventListener('click', () => renderPopupView(card, ann));
+  card.querySelector('.hl-save').addEventListener('click', async () => {
+    const name = card.querySelector('.hl-name-input').value.trim();
+    const memo = card.querySelector('.hl-memo-input').value.trim();
+    if (!name || !memo) { alert('名前とメモを入力してください。'); return; }
+    try { await updateDoc(doc(db, 'seo_annotations', ann.id), { name, memo, updatedAt: serverTimestamp() }); closeFloating(); } catch (e) { alert('更新に失敗しました。'); console.error(e); }
+  });
+}
+document.addEventListener('mouseup', (e) => {
+  if (e.target.closest('.hl-toolbar, .hl-card')) return;
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+  if (!root.contains(range.commonAncestorContainer) || range.toString().trim().length === 0) return;
+  showToolbar(range);
+});
+document.addEventListener('mousedown', (e) => {
+  if (floatingEl && !floatingEl.contains(e.target) && !e.target.closest('mark.hl-highlight, span.hl-underline')) closeFloating();
+});
+root.addEventListener('click', (e) => { const el = e.target.closest('[data-id]'); if (el) showPopup(el.dataset.id, el); });
+const q = query(collection(db, 'seo_annotations'), orderBy('createdAt', 'asc'));
+onSnapshot(q, (snapshot) => { annotations = snapshot.docs.map((d) => ({ id: d.id, ...d.data() })); renderAnnotations(); });
+</script>
+</body></html>

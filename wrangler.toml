@@ -1,0 +1,8 @@
+name = "kato-seminar-review"
+compatibility_date = "2026-08-01"
+compatibility_flags = ["nodejs_compat"]
+main = "src/index.js"
+
+[assets]
+directory = "./"
+run_worker_first = true
